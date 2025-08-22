@@ -1,0 +1,19 @@
+# OS / editors
+.DS_Store
+*.log
+*.swp
+.idea/
+.vscode/
+
+# deps / builds
+node_modules/
+dist/
+build/
+.cache/
+.tmp/
+coverage/
+
+# env / secrets
+.env
+.env.*
+.aws/

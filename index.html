@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aureus Gold Signal</title>
+    <meta
+      name="description"
+      content="Daily gold investment guidance across short, mid and long-term horizons."
+    />
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="preload" href="styles.css" as="style" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="container">
+        <h1>Aureus Gold Signal</h1>
+        <p class="tagline">Daily BUY/WAIT guidance — fast, credible, mobile-first.</p>
+      </div>
+    </header>
+    <main id="app" class="container" role="main">
+      <p id="last-updated" aria-live="polite">Last updated: —</p>
+      <section aria-labelledby="decisions-heading">
+        <h2 id="decisions-heading" class="sr-only">Decisions</h2>
+        <div id="cards" class="cards"><!-- Phase 2: add static mock cards here --></div>
+      </section>
+
+      <section aria-labelledby="sources-heading">
+        <h2 id="sources-heading" class="sr-only">Sources</h2>
+        <details id="sources" class="sources" hidden>
+          <summary>Top sources</summary>
+          <ul id="sources-list"></ul>
+        </details>
+      </section>
+
+      <div id="status" role="status" aria-live="polite" class="status"></div>
+    </main>
+    <noscript>
+      <p class="container">JavaScript is required to load the latest recommendation.</p>
+    </noscript>
+    <script defer src="app.js"></script>
+  </body>
+</html>
