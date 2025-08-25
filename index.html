@@ -1,44 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Aureus Gold Signal</title>
-    <meta
-      name="description"
-      content="Daily gold investment guidance across short, mid and long-term horizons."
-    />
-    <meta name="theme-color" content="#0b1220" />
-    <link rel="preload" href="styles.css" as="style" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="site-header" role="banner">
-      <div class="container">
-        <h1>Aureus Gold Signal</h1>
-        <p class="tagline">Daily BUY/WAIT guidance — fast, credible, mobile-first.</p>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aureus Gold Signal</title>
+  <meta name="description" content="Daily gold investment guidance across short, mid and long-term horizons.">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="preload" href="styles.css" as="style">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <h1 class="site-title">Aureus Gold Signal</h1>
+      <p class="tagline">Daily BUY/WAIT guidance — fast, credible, mobile-first.</p>
+    </div>
+  </header>
+
+  <main id="app" class="container" role="main">
+    <p id="last-updated" aria-live="polite">Last updated: —</p>
+
+    <section aria-labelledby="decisions-heading">
+      <h2 id="decisions-heading" class="section-title">Outlook</h2>
+
+      <div id="cards" class="cards" role="list">
+        <!-- Short-term -->
+        <article class="card" role="listitem" aria-label="Short-term outlook">
+          <header class="card-head">
+            <h3 class="card-title">Short-term</h3>
+            <span class="badge buy" aria-label="Decision: BUY" title="Decision">BUY</span>
+          </header>
+          <p class="score" aria-label="Confidence score">Score: <strong>0.71</strong></p>
+          <ul class="points">
+            <li>Momentum uptick over 5–10d.</li>
+            <li>Real yields easing near-term.</li>
+            <li>USD (DXY) softening w/w.</li>
+          </ul>
+        </article>
+
+        <!-- Mid-term -->
+        <article class="card" role="listitem" aria-label="Mid-term outlook">
+          <header class="card-head">
+            <h3 class="card-title">Mid-term</h3>
+            <span class="badge wait" aria-label="Decision: WAIT" title="Decision">WAIT</span>
+          </header>
+          <p class="score" aria-label="Confidence score">Score: <strong>0.55</strong></p>
+          <ul class="points">
+            <li>Range-bound risk into 2–3m.</li>
+            <li>Policy path uncertainty.</li>
+            <li>Mixed flows from ETFs.</li>
+          </ul>
+        </article>
+
+        <!-- Long-term -->
+        <article class="card" role="listitem" aria-label="Long-term outlook">
+          <header class="card-head">
+            <h3 class="card-title">Long-term</h3>
+            <span class="badge buy" aria-label="Decision: BUY" title="Decision">BUY</span>
+          </header>
+          <p class="score" aria-label="Confidence score">Score: <strong>0.78</strong></p>
+          <ul class="points">
+            <li>Structural demand (EM CBs).</li>
+            <li>Inflation hedging tailwinds.</li>
+            <li>Limited new mine supply.</li>
+          </ul>
+        </article>
       </div>
-    </header>
-    <main id="app" class="container" role="main">
-      <p id="last-updated" aria-live="polite">Last updated: —</p>
-      <section aria-labelledby="decisions-heading">
-        <h2 id="decisions-heading" class="sr-only">Decisions</h2>
-        <div id="cards" class="cards"><!-- Phase 2: add static mock cards here --></div>
-      </section>
+    </section>
 
-      <section aria-labelledby="sources-heading">
-        <h2 id="sources-heading" class="sr-only">Sources</h2>
-        <details id="sources" class="sources" hidden>
-          <summary>Top sources</summary>
-          <ul id="sources-list"></ul>
-        </details>
-      </section>
+    <section aria-labelledby="sources-heading" class="sources-wrap">
+      <h2 id="sources-heading" class="section-title">Sources</h2>
+      <details id="sources" class="sources">
+        <summary class="summary-touch">Top sources (sample)</summary>
+        <ul id="sources-list">
+          <li><a href="#" rel="noopener noreferrer nofollow">Fedspeak summary (sample)</a></li>
+          <li><a href="#" rel="noopener noreferrer nofollow">CPI preview (sample)</a></li>
+          <li><a href="#" rel="noopener noreferrer nofollow">ETF flow tracker (sample)</a></li>
+        </ul>
+      </details>
+    </section>
 
-      <div id="status" role="status" aria-live="polite" class="status"></div>
-    </main>
-    <noscript>
-      <p class="container">JavaScript is required to load the latest recommendation.</p>
-    </noscript>
-    <script defer src="app.js"></script>
-  </body>
+    <div id="status" role="status" aria-live="polite" class="status">Ready.</div>
+  </main>
+
+  <noscript>
+    <p class="container">JavaScript is required to load the latest recommendation.</p>
+  </noscript>
+
+  <script defer src="app.js"></script>
+</body>
+
 </html>
