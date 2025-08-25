@@ -1,17 +1,67 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aureus Gold Signal</title>
   <meta name="description" content="Daily gold investment guidance across short, mid and long-term horizons.">
   <meta name="theme-color" content="#0b1220">
-  <link rel="preload" href="styles.css" as="style">
+  <meta name="color-scheme" content="dark light">
+
+  <!-- Security: Report-Only CSP (tune in prod; no credentials exposed) -->
+  <meta http-equiv="Content-Security-Policy-Report-Only"
+        content="default-src 'self';
+                 connect-src 'self' https://gda-outputs-760321902186-eu-central-1.s3.eu-central-1.amazonaws.com;
+                 img-src 'self' https: data:;
+                 style-src 'self' 'unsafe-inline';
+                 script-src 'self';
+                 object-src 'none';
+                 base-uri 'none';
+                 frame-ancestors 'none';
+                 upgrade-insecure-requests">
+
+  <!-- Networking hints for S3 data fetch -->
+  <link rel="dns-prefetch" href="https://gda-outputs-760321902186-eu-central-1.s3.eu-central-1.amazonaws.com">
+  <link rel="preconnect" href="https://gda-outputs-760321902186-eu-central-1.s3.eu-central-1.amazonaws.com" crossorigin>
+
+  <!-- Critical CSS: first paint (full CSS continues in styles.css) -->
+  <style>
+    :root{--bg:#0b1220;--card:#111a2b;--text:#e6edf3;--muted:#9fb2c8;--accent:#2ea043;--warn:#b62324;--link:#58a6ff;--border:#20304a;--focus:#8ab4f8}
+    *{box-sizing:border-box}html,body{height:100%}
+    body{margin:0;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";background:var(--bg);color:var(--text)}
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{position:static;width:auto;height:auto;padding:8px;border-radius:8px;background:#1f2a44}
+    .container{max-width:880px;margin:0 auto;padding:16px}
+    .site-header{border-bottom:1px solid var(--border)}
+    .site-title{margin:0}
+    .tagline{color:var(--muted);margin-top:4px}
+    .section-title{font-size:1.125rem;margin:16px 0 8px}
+    .cards{display:grid;gap:12px;grid-template-columns:1fr}
+    @media (min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:140px}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+    .card-title{margin:0;font-size:1.05rem}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:600;letter-spacing:.4px}
+    .badge.buy{background:var(--accent);color:#04120a}
+    .badge.wait{background:var(--warn);color:#fff}
+    .badge:not(.buy):not(.wait){background:#36435a;color:#fff}
+    .score{margin:4px 0 6px;color:var(--muted)}
+    a{color:var(--link)}
+    .status{color:var(--muted);margin-top:8px}
+    #last-updated{color:var(--muted);margin:8px 0}
+    .freshness{margin-left:8px;color:var(--muted);font-size:.95rem}
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+    }
+  </style>
+
+  <!-- Non-critical CSS (kept for maintainability) -->
+  <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+  <a class="skip-link" href="#app">Skip to main content</a>
+
   <header class="site-header" role="banner">
     <div class="container">
       <h1 class="site-title">Aureus Gold Signal</h1>
@@ -19,67 +69,20 @@
     </div>
   </header>
 
-  <main id="app" class="container" role="main">
+  <main id="app" class="container" role="main" aria-busy="false">
     <p id="last-updated" aria-live="polite">Last updated: —</p>
     <span id="freshness" class="freshness" aria-live="polite"></span>
 
-    <section aria-labelledby="decisions-heading">
+    <section aria-labelledby="decisions-heading" role="region">
       <h2 id="decisions-heading" class="section-title">Outlook</h2>
-
-      <div id="cards" class="cards" role="list">
-        <!-- Short-term -->
-        <article class="card" role="listitem" aria-label="Short-term outlook">
-          <header class="card-head">
-            <h3 class="card-title">Short-term</h3>
-            <span class="badge buy" aria-label="Decision: BUY" title="Decision">BUY</span>
-          </header>
-          <p class="score" aria-label="Confidence score">Score: <strong>0.71</strong></p>
-          <ul class="points">
-            <li>Momentum uptick over 5–10d.</li>
-            <li>Real yields easing near-term.</li>
-            <li>USD (DXY) softening w/w.</li>
-          </ul>
-        </article>
-
-        <!-- Mid-term -->
-        <article class="card" role="listitem" aria-label="Mid-term outlook">
-          <header class="card-head">
-            <h3 class="card-title">Mid-term</h3>
-            <span class="badge wait" aria-label="Decision: WAIT" title="Decision">WAIT</span>
-          </header>
-          <p class="score" aria-label="Confidence score">Score: <strong>0.55</strong></p>
-          <ul class="points">
-            <li>Range-bound risk into 2–3m.</li>
-            <li>Policy path uncertainty.</li>
-            <li>Mixed flows from ETFs.</li>
-          </ul>
-        </article>
-
-        <!-- Long-term -->
-        <article class="card" role="listitem" aria-label="Long-term outlook">
-          <header class="card-head">
-            <h3 class="card-title">Long-term</h3>
-            <span class="badge buy" aria-label="Decision: BUY" title="Decision">BUY</span>
-          </header>
-          <p class="score" aria-label="Confidence score">Score: <strong>0.78</strong></p>
-          <ul class="points">
-            <li>Structural demand (EM CBs).</li>
-            <li>Inflation hedging tailwinds.</li>
-            <li>Limited new mine supply.</li>
-          </ul>
-        </article>
-      </div>
+      <div id="cards" class="cards" role="list"></div>
     </section>
 
-    <section aria-labelledby="sources-heading" class="sources-wrap">
+    <section aria-labelledby="sources-heading" class="sources-wrap" role="region">
       <h2 id="sources-heading" class="section-title">Sources</h2>
-      <details id="sources" class="sources">
-        <summary class="summary-touch">Top sources (sample)</summary>
-        <ul id="sources-list">
-          <li><a href="#" rel="noopener noreferrer nofollow">Fedspeak summary (sample)</a></li>
-          <li><a href="#" rel="noopener noreferrer nofollow">CPI preview (sample)</a></li>
-          <li><a href="#" rel="noopener noreferrer nofollow">ETF flow tracker (sample)</a></li>
-        </ul>
+      <details id="sources" class="sources" hidden>
+        <summary class="summary-touch">Top sources</summary>
+        <ul id="sources-list"></ul>
       </details>
     </section>
 
@@ -92,5 +95,4 @@
 
   <script defer src="app.js"></script>
 </body>
-
 </html>

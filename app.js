@@ -5,26 +5,31 @@
   const DATA_URL = "https://gda-outputs-760321902186-eu-central-1.s3.eu-central-1.amazonaws.com/latest/answer.json";
 
   // Elements
-  const lastUpdatedEl  = document.getElementById("last-updated");
-  const freshnessEl    = document.getElementById("freshness");
-  const statusEl       = document.getElementById("status");
-  const cardsEl        = document.getElementById("cards");
+  const lastUpdatedEl = document.getElementById("last-updated");
+  const freshnessEl = document.getElementById("freshness");
+  const statusEl = document.getElementById("status");
+  const cardsEl = document.getElementById("cards");
   const sourcesDetails = document.getElementById("sources");
-  const sourcesListEl  = document.getElementById("sources-list");
+  const sourcesListEl = document.getElementById("sources-list");
 
   // LocalStorage keys
   const LS = {
-    etag:   "aureus:etag",
-    body:   "aureus:body",          // full top-level JSON string
-    checked:"aureus:lastCheckedISO" // ISO timestamp of last successful fetch
+    etag: "aureus:etag",
+    body: "aureus:body",          // full top-level JSON string
+    checked: "aureus:lastCheckedISO" // ISO timestamp of last successful fetch
   };
 
   // Helpers
-  const utcDayKey = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD (UTC)
+  const utcDayKey = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
   const formatUtc = (ts) => { try { return new Date(ts).toUTCString(); } catch { return "—"; } };
-  const setStatus = (msg, cls="") => { statusEl.className = `status ${cls}`.trim(); statusEl.textContent = msg; };
+  const setStatus = (msg, cls = "") => { statusEl.className = `status ${cls}`.trim(); statusEl.textContent = msg; };
 
-  function relFreshness(fromIso){
+  function setBusy(isBusy) {
+    const main = document.querySelector("main#app");
+    if (main) main.setAttribute("aria-busy", isBusy ? "true" : "false");
+  }
+
+  function relFreshness(fromIso) {
     if (!fromIso) return "";
     const now = Date.now();
     const then = Date.parse(fromIso);
@@ -37,18 +42,18 @@
     return `last checked ${hrs}h ago`;
   }
 
-  function safeHref(u){
+  function safeHref(u) {
     try {
       const url = new URL(String(u));
       if (url.protocol === "http:" || url.protocol === "https:") return url.href;
-    } catch(_){}
+    } catch (_) { }
     return null;
   }
 
-  function renderCard(label, payload){
+  function renderCard(label, payload) {
     const article = document.createElement("article");
     article.className = "card";
-    article.setAttribute("role","listitem");
+    article.setAttribute("role", "listitem");
     article.setAttribute("aria-label", `${label} outlook`);
 
     const head = document.createElement("header");
@@ -77,13 +82,13 @@
 
     const ul = document.createElement("ul");
     ul.className = "points";
-    const points = Array.isArray(payload?.key_points) ? payload.key_points.slice(0,4) : [];
-    if (points.length === 0){
+    const points = Array.isArray(payload?.key_points) ? payload.key_points.slice(0, 4) : [];
+    if (points.length === 0) {
       const li = document.createElement("li");
       li.textContent = "No key points.";
       ul.append(li);
     } else {
-      for (const p of points){
+      for (const p of points) {
         const li = document.createElement("li");
         li.textContent = String(p);
         ul.append(li);
@@ -93,7 +98,7 @@
     return article;
   }
 
-  function upsertAssessmentDate(dateUtc){
+  function upsertAssessmentDate(dateUtc) {
     const existing = document.getElementById("assessment-date");
     if (existing) existing.remove();
     if (!dateUtc) return;
@@ -105,7 +110,7 @@
     parent.insertBefore(p, cardsEl);
   }
 
-  function renderFromTop(top){
+  function renderFromTop(top) {
     try {
       // Last updated
       lastUpdatedEl.textContent = `Last updated: ${top?.timestamp_utc ? formatUtc(top.timestamp_utc) : "—"}`;
@@ -119,7 +124,7 @@
       cardsEl.innerHTML = "";
       const horizons = [
         ["Short-term", payload.short_term],
-        ["Mid-term",  payload.mid_term],
+        ["Mid-term", payload.mid_term],
         ["Long-term", payload.long_term],
       ];
       for (const [label, obj] of horizons) cardsEl.append(renderCard(label, obj ?? {}));
@@ -128,29 +133,29 @@
       sourcesListEl.innerHTML = "";
       const sources = Array.isArray(payload.top_sources) ? payload.top_sources : [];
       let shown = 0;
-      for (const s of sources){
+      for (const s of sources) {
         const href = safeHref(s);
         if (!href) continue;
         const li = document.createElement("li");
-        const a  = document.createElement("a");
-        a.href = href; a.target="_blank"; a.rel="noopener noreferrer nofollow";
-        a.textContent = href.replace(/^https?:\/\//,"").replace(/\/$/,"");
+        const a = document.createElement("a");
+        a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer nofollow";
+        a.textContent = href.replace(/^https?:\/\//, "").replace(/\/$/, "");
         li.append(a); sourcesListEl.append(li); shown++;
       }
       sourcesDetails.hidden = shown === 0;
 
       // Date inside response
       upsertAssessmentDate(payload?.date_utc);
-    } catch (e){
+    } catch (e) {
       console.error(e);
       throw e;
     }
   }
 
-  async function fetchWithTimeout(url, {headers} = {}, timeoutMs=8000, retries=1){
+  async function fetchWithTimeout(url, { headers } = {}, timeoutMs = 8000, retries = 1) {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(new DOMException("Timeout","AbortError")), timeoutMs);
-    try{
+    const timer = setTimeout(() => ctrl.abort(new DOMException("Timeout", "AbortError")), timeoutMs);
+    try {
       const res = await fetch(url, {
         method: "GET",
         headers,
@@ -163,17 +168,17 @@
       // Accept 200–299 and 304
       if ((res.status >= 200 && res.status < 300) || res.status === 304) return res;
       throw new Error(`HTTP ${res.status}`);
-    } catch (err){
+    } catch (err) {
       clearTimeout(timer);
-      if (retries > 0){
+      if (retries > 0) {
         await new Promise(r => setTimeout(r, 900));
-        return fetchWithTimeout(url, {headers}, timeoutMs, retries - 1);
+        return fetchWithTimeout(url, { headers }, timeoutMs, retries - 1);
       }
       throw err;
     }
   }
 
-  function showEmptyState(msg){
+  function showEmptyState(msg) {
     setStatus(msg, "error");
     cardsEl.innerHTML = `
       <article class="card"><header class="card-head"><h3 class="card-title">Short-term</h3><span class="badge">—</span></header><p class="score">Score: <strong>—</strong></p><ul class="points"><li>Data unavailable.</li></ul></article>
@@ -184,18 +189,19 @@
     upsertAssessmentDate(null);
   }
 
-  function updateFreshnessLabel(){
+  function updateFreshnessLabel() {
     const iso = localStorage.getItem(LS.checked);
     freshnessEl.textContent = relFreshness(iso);
   }
 
-  async function loadData(){
+  async function loadData() {
+    setBusy(true);
     setStatus("Checking for updates…", "loading");
 
     // Early paint from cache if available (good for perceived speed)
     const cachedTopStr = localStorage.getItem(LS.body);
-    if (cachedTopStr){
-      try { renderFromTop(JSON.parse(cachedTopStr)); } catch {}
+    if (cachedTopStr) {
+      try { renderFromTop(JSON.parse(cachedTopStr)); } catch { }
       updateFreshnessLabel();
     }
 
@@ -208,13 +214,13 @@
     const etagPrev = localStorage.getItem(LS.etag);
     if (etagPrev) headers["If-None-Match"] = etagPrev;
 
-    try{
-      const res = await fetchWithTimeout(url, {headers}, 8000, 1);
+    try {
+      const res = await fetchWithTimeout(url, { headers }, 8000, 1);
 
-      if (res.status === 304){
+      if (res.status === 304) {
         // Not modified — ensure we have cached body
         const cached = localStorage.getItem(LS.body);
-        if (cached){
+        if (cached) {
           setStatus("Up to date.");
           localStorage.setItem(LS.checked, new Date().toISOString());
           updateFreshnessLabel();
@@ -248,9 +254,9 @@
       localStorage.setItem(LS.checked, new Date().toISOString());
       updateFreshnessLabel();
 
-    } catch (err){
+    } catch (err) {
       console.error(err);
-      if (cachedTopStr){
+      if (cachedTopStr) {
         setStatus("Offline or server unreachable — showing cached data.", "error");
       } else {
         let msg = "Error loading data.";
@@ -259,6 +265,9 @@
         else if (String(err).includes("HTTP 404")) msg = "Data not found (404).";
         showEmptyState(msg);
       }
+    }
+    finally {
+      setBusy(false);
     }
   }
 
