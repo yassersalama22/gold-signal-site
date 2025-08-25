@@ -173,3 +173,6 @@ button:focus-visible,
 }
 .status.error{ color:#ffb4b4; }
 .status.loading{ color:#9fb2c8; }
+
+/* Freshness label */
+.freshness{ margin-left:8px; color:var(--muted); font-size:0.95rem }
