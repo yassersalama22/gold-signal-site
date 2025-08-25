@@ -1,0 +1,7 @@
+{
+  "model": "gpt-5",
+  "timestamp_utc": "2025-08-20T06:31:23.831591+00:00",
+  "prompt_s3": "s3://gda-prompts/gold_prediction_prompt.md",
+  "prompt": "… long system prompt …",
+  "response": "{ \"date_utc\": \"2025-08-20\", \"short_term\": { \"decision\": \"BUY\", \"score\": 0.71, \"key_points\": [\"Momentum uptick 5–10d\", \"Real yields easing\", \"DXY softening w/w\"] }, \"mid_term\": { \"decision\": \"WAIT\", \"score\": 0.55, \"key_points\": [\"Range-bound 2–3m\", \"Policy uncertainty\"] }, \"long_term\": { \"decision\": \"BUY\", \"score\": 0.78, \"key_points\": [\"Structural demand\", \"Inflation hedge\"] }, \"top_sources\": [\"https://www.federalreserve.gov/\", \"https://fred.stlouisfed.org/\"] }"
+}
