@@ -16,13 +16,22 @@
   const LS = {
     etag: "aureus:etag",
     body: "aureus:body",          // full top-level JSON string
-    checked: "aureus:lastCheckedISO" // ISO timestamp of last successful fetch
+    checked: "aureus:lastCheckedISO", // ISO timestamp of last successful fetch
+    lastMod: "aureus:lastModified"    // HTTP Last-Modified header (fallback)
   };
 
   // Helpers
   const utcDayKey = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
   const formatUtc = (ts) => { try { return new Date(ts).toUTCString(); } catch { return "—"; } };
   const setStatus = (msg, cls = "") => { statusEl.className = `status ${cls}`.trim(); statusEl.textContent = msg; };
+
+  // Normalize ETag to a quoted-string as per RFC.
+  function normalizeEtag(v) {
+    if (!v || typeof v !== "string") return null;
+    const s = v.trim();
+    if ((s.startsWith('W/"') && s.endsWith('"')) || (s.startsWith('"') && s.endsWith('"'))) return s;
+    return `"${s.replace(/^W\//, "")}"`;
+  }
 
   function setBusy(isBusy) {
     const main = document.querySelector("main#app");
@@ -211,8 +220,11 @@
     const url = useMock ? baseUrl : `${baseUrl}?d=${utcDayKey()}`;
 
     const headers = {};
-    const etagPrev = localStorage.getItem(LS.etag);
+    const etagPrev = normalizeEtag(localStorage.getItem(LS.etag));
+    const lastModPrev = localStorage.getItem(LS.lastMod);
     if (etagPrev) headers["If-None-Match"] = etagPrev;
+    if (lastModPrev) headers["If-Modified-Since"] = lastModPrev;
+    try { console.debug("Requesting", url, { etagPrev, lastModPrev }); } catch {}
 
     try {
       const res = await fetchWithTimeout(url, { headers }, 8000, 1);
@@ -230,8 +242,10 @@
           const res2 = await fetchWithTimeout(url, {}, 8000, 0);
           const text = await res2.text();
           localStorage.setItem(LS.body, text);
-          const etag2 = res2.headers.get("ETag");
+          const etag2 = normalizeEtag(res2.headers.get("ETag"));
           if (etag2) localStorage.setItem(LS.etag, etag2);
+          const lastMod2 = res2.headers.get("Last-Modified");
+          if (lastMod2) localStorage.setItem(LS.lastMod, lastMod2);
           const top = JSON.parse(text);
           renderFromTop(top);
           setStatus("Loaded.");
@@ -245,14 +259,17 @@
       const text = await res.text();
       // Store body + ETag if provided (CORS must expose ETag)
       localStorage.setItem(LS.body, text);
-      const etag = res.headers.get("ETag");
+      const etag = normalizeEtag(res.headers.get("ETag"));
       if (etag) localStorage.setItem(LS.etag, etag);
+      const lastMod = res.headers.get("Last-Modified");
+      if (lastMod) localStorage.setItem(LS.lastMod, lastMod);
 
       const top = JSON.parse(text);
       renderFromTop(top);
       setStatus("Loaded.");
       localStorage.setItem(LS.checked, new Date().toISOString());
       updateFreshnessLabel();
+      try { console.debug("Response", res.status, { etag, lastMod }); } catch {}
 
     } catch (err) {
       console.error(err);
