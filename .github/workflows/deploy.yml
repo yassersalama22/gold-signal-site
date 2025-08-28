@@ -1,0 +1,71 @@
+name: Deploy Static Site to S3
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "index.html"
+      - "styles.css"
+      - "app.js"
+      - ".github/workflows/deploy.yml"
+      - "infrastructure/**"
+
+permissions:
+  id-token: write    # required for OIDC
+  contents: read     # checkout
+
+env:
+  AWS_REGION: eu-central-1
+  SITE_BUCKET: gold-signal-site-760321902186-eu-central-1
+
+jobs:
+  deploy:
+    name: Sync to S3
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gold-signal-site-deploy
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::760321902186:role/gold-signal-site-deployer
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Show caller identity (sanity)
+        run: aws sts get-caller-identity
+
+      # No build step needed; we deploy raw static files.
+
+      - name: Upload index.html (short TTL)
+        run: |
+          aws s3 cp index.html "s3://gold-signal-site-760321902186-eu-central-1/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "max-age=60, must-revalidate"
+
+      - name: Upload styles.css (long immutable)
+        run: |
+          aws s3 cp styles.css "s3://gold-signal-site-760321902186-eu-central-1/styles.css" \
+            --content-type "text/css; charset=utf-8" \
+            --cache-control "public, max-age=31536000, immutable"
+
+      - name: Upload app.js (long immutable)
+        run: |
+          aws s3 cp app.js "s3://gold-signal-site-760321902186-eu-central-1/app.js" \
+            --content-type "application/javascript; charset=utf-8" \
+            --cache-control "public, max-age=31536000, immutable"
+
+      - name: (Optional) Upload mock assets for testing
+        if: ${{ hashFiles('mock/**') != '' }}
+        run: |
+          aws s3 sync mock/ "s3://gold-signal-site-760321902186-eu-central-1/mock/" \
+            --cache-control "max-age=60, must-revalidate" \
+            --content-type "application/json"
+
+      - name: Verify site URL
+        run: |
+          echo "http://gold-signal-site-760321902186-eu-central-1.s3-website.eu-central-1.amazonaws.com"
